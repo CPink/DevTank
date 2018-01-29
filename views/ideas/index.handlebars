@@ -1,0 +1,10 @@
+{{#each ideas}}
+    <div class="card card-body mb-3">
+        <h4>{{ title }}</h4>
+        <p>{{ details }}</p>
+    </div>
+{{else}}
+    <div class="jumbotron text-center">
+        <h1 class="display-3">No App Ideas Yet</h1>
+    </div>
+{{/each}}

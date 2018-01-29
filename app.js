@@ -27,6 +27,11 @@ db.once('open', () => {
 
 });
 
+/*
+Models
+----------------------------------------------------
+*/
+
 //load idea model
 require('./models/Idea');
 
@@ -66,6 +71,22 @@ app.get('/', (req, res) => {
 app.get('/about', (req, res) => {
     res.render('about');
 });
+
+//idea index page
+app.get('/ideas', (req, res) => {
+    //get all ideas from server
+    Idea.find({})
+
+    //sort ideas that are rendered by date
+    .sort({date: 'desc'})
+    
+    .then(ideas => {
+        //render ideas from server to ideas/index
+    res.render('ideas/index', {
+        ideas: ideas
+    });
+    })
+})
 
 //add idea form route
 app.get('/ideas/add', (req, res) => {
