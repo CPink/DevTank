@@ -10,6 +10,11 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+//load routes
+const ideas = require('./routes/ideas');
+
+const users = require('./routes/users');
+
 /*
 Mongoose Setup
 ---------------------------------------------------
@@ -30,15 +35,6 @@ db.once('open', () => {
 
 });
 
-/*
-Models
-----------------------------------------------------
-*/
-
-//load idea model
-require('./models/Idea');
-
-const Idea = mongoose.model('ideas');
 
 /*
 Middleware
@@ -97,99 +93,12 @@ app.get('/about', (req, res) => {
     res.render('about');
 });
 
-//idea index page
-app.get('/ideas', (req, res) => {
-    //get all ideas from server
-    Idea.find({})
 
-    //sort ideas that are rendered by date
-    .sort({date: 'desc'})
+//use ideas route
+app.use('/ideas', ideas);
 
-    .then(ideas => {
-        //render ideas from server to ideas/index
-    res.render('ideas/index', {
-        ideas: ideas
-    });
-    })
-})
-
-//add idea form route
-app.get('/ideas/add', (req, res) => {
-    res.render('ideas/add');
-});
-
-//edit idea form route GET
-app.get('/ideas/edit/:id', (req, res) => {
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .then(idea => {
-        res.render('ideas/edit', {
-            idea:idea
-        });
-    })
-    
-});
-
-//process POST idea form
-app.post('/ideas', (req, res) => {
-    //console.log(req.body);
-    let errors = [];
-
-    if(!req.body.title){
-        errors.push({ text:'Please add a title' });
-    }
-    if(!req.body.details){
-        errors.push({ text:'Please add some details' });
-    }
-    if(errors.length > 0){
-        res.render('ideas/add', {
-            errors: errors,
-            title: req.body.title,
-            details: req.body.details
-        });
-    }else{
-        const newUser = {
-            title: req.body.title,
-            details: req.body.details
-        }
-        new Idea(newUser)
-        .save()
-        .then(idea => {
-            req.flash('success_msg', 'App Idea was Added');
-            res.redirect('/ideas');
-        });
-    }
-});
-
-//process edit form PUT
-app.put('/ideas/:id', (req, res) => {
-    //res.send('PUT');
-    Idea.findOne({
-        _id: req.params.id
-    })
-    .then(idea => {
-        //new values
-        idea.title = req.body.title;
-        idea.details = req.body.details;
-
-        idea.save()
-        .then(idea => {
-            req.flash('success_msg', 'App Idea was Updated');
-            res.redirect('/ideas');
-        });
-    });
-});
-
-//process DELETE for idea
-app.delete('/ideas/:id', (req, res) => {
-    //res.send('DELETE');
-    Idea.remove({_id: req.params.id})
-    .then(() => {
-        req.flash('success_msg', 'App Idea was removed');
-        res.redirect('/ideas');
-    })
-})
+//use users route
+app.use('/users', users);
 
 const port = 5000; 
 
