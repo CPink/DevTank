@@ -1,20 +1,41 @@
 
 const express = require('express');
 const exphbs = require('express-handlebars');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+
 
 const app = express();
 
+/*
+Mongoose Setup
+---------------------------------------------------
+*/
+
 //connect to mongoose
 const mongoDb = 'mongodb://localhost/devtank-dev';
-mongoose.connect(mongoDb, {
-    useMongoClient: true
-});
+mongoose.connect(mongoDb);
 
+//get mongoose to use the global promise library
+mongoose.Promise = global.Promise;
+
+//mongoose default connection
 const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'MongoDb connection error:'));
+db.once('open', () => {
 
+});
+
+//load idea model
+require('./models/Idea');
+
+const Idea = mongoose.model('ideas');
+
+/*
+Middleware
+-----------------------------------------------------
+*/
 
 //handlebars middleware
 app.engine('handlebars', exphbs({
@@ -22,6 +43,16 @@ app.engine('handlebars', exphbs({
 }));
 
 app.set('view engine', 'handlebars');
+
+
+//body-parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+/*
+Routes
+----------------------------------------------------------------
+*/
 
 //index route
 app.get('/', (req, res) => {
@@ -34,6 +65,41 @@ app.get('/', (req, res) => {
 //about route
 app.get('/about', (req, res) => {
     res.render('about');
+});
+
+//add idea form route
+app.get('/ideas/add', (req, res) => {
+    res.render('ideas/add');
+});
+
+//process form
+app.post('/ideas', (req, res) => {
+    //console.log(req.body);
+    let errors = [];
+
+    if(!req.body.title){
+        errors.push({ text:'Please add a title' });
+    }
+    if(!req.body.details){
+        errors.push({ text:'Please add some details' });
+    }
+    if(errors.length > 0){
+        res.render('ideas/add', {
+            errors: errors,
+            title: req.body.title,
+            details: req.body.details
+        });
+    }else{
+        const newUser = {
+            title: req.body.title,
+            details: req.body.details
+        }
+        new Idea(newUser)
+        .save()
+        .then(idea => {
+            res.redirect('/ideas');
+        });
+    }
 });
 
 const port = 5000; 
