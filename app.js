@@ -98,7 +98,7 @@ app.get('/ideas/add', (req, res) => {
     res.render('ideas/add');
 });
 
-//edit idea form route
+//edit idea form route GET
 app.get('/ideas/edit/:id', (req, res) => {
     Idea.findOne({
         _id: req.params.id
@@ -111,7 +111,7 @@ app.get('/ideas/edit/:id', (req, res) => {
     
 });
 
-//process add idea form
+//process POST idea form
 app.post('/ideas', (req, res) => {
     //console.log(req.body);
     let errors = [];
