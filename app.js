@@ -6,11 +6,15 @@ const mongoose = require('mongoose');
 const app = express();
 
 //connect to mongoose
-mongoose.connect('mongodb://localhost/devtank-dev', {
+const mongoDb = 'mongodb://localhost/devtank-dev';
+mongoose.connect(mongoDb, {
+    useMongoClient: true
+});
 
-})
-.then(() => console.log('mongodb connected...'))
-.catch(err => console.log(err));
+const db = mongoose.connection;
+
+db.on('error', console.error.bind(console, 'MongoDb connection error:'));
+
 
 //handlebars middleware
 app.engine('handlebars', exphbs({
