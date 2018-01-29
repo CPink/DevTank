@@ -159,6 +159,15 @@ app.put('/ideas/:id', (req, res) => {
     });
 });
 
+//process DELETE for idea
+app.delete('/ideas/:id', (req, res) => {
+    //res.send('DELETE');
+    Idea.remove({_id: req.params.id})
+    .then(() => {
+        res.redirect('/ideas');
+    })
+})
+
 const port = 5000; 
 
 //initilize app, pass in port number with call back
