@@ -1,5 +1,6 @@
 
 const express = require('express');
+const path = require('path');
 const exphbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const flash = require('connect-flash');
@@ -55,6 +56,9 @@ app.use(bodyParser.json());
 
 //method-override middleware
 app.use(methodOverride('_method'));
+
+//static folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 //express-session middleware
 app.use(session({
