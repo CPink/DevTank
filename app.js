@@ -7,7 +7,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-
+const passport = require('passport');
 
 const app = express();
 
@@ -15,6 +15,10 @@ const app = express();
 const ideas = require('./routes/ideas');
 
 const users = require('./routes/users');
+
+
+//passport config
+require('./config/passport')(passport);
 
 /*
 Mongoose Setup
@@ -67,6 +71,10 @@ app.use(session({
     saveUninitialized: true
 }));
 
+//passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 //connect-flash middleware
 app.use(flash());
 
@@ -76,8 +84,11 @@ app.use((req,res,next) => {
     res.locals.success_msg = req.flash('success_msg');
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
     next();
 });
+
+
 
 /*
 Routes
