@@ -20,13 +20,16 @@ const users = require('./routes/users');
 //passport config
 require('./config/passport')(passport);
 
+//DB config
+const dbConfig = require('./config/database');
+
 /*
 Mongoose Setup
 ---------------------------------------------------
 */
 
 //connect to mongoose
-const mongoDb = 'mongodb://localhost/devtank-dev';
+const mongoDb = dbConfig.mongoURI;
 mongoose.connect(mongoDb);
 
 //get mongoose to use the global promise library
@@ -115,7 +118,7 @@ app.use('/ideas', ideas);
 //use users route
 app.use('/users', users);
 
-const port = 5000; 
+const port = process.env.PORT || 5000; 
 
 //initilize app, pass in port number with call back
 app.listen(port, () => {
